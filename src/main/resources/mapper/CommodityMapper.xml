@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qraffa.easyrentboot.dao.CommodityDao">
+<!--查询所有商品信息-->
+    <resultMap id="commodityAndPic1" type="com.qraffa.easyrentboot.model.entity.Commodity">
+        <id property="cid" column="cid"/>
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="detail" column="detail"/>
+        <result property="deposit" column="deposit"/>
+        <result property="rent" column="rent"/>
+        <result property="rentalTime" column="rental_time"/>
+        <result property="requestTime" column="request_time"/>
+        <result property="shelfTime" column="shelf_time"/>
+        <result property="status" column="status"/>
+        <collection property="commodityPicList" ofType="com.qraffa.easyrentboot.model.entity.CommodityPic">
+            <id property="pid" column="pid"/>
+            <result property="commodityId" column="commodity_id"/>
+            <result property="picPath" column="pic_path"/>
+        </collection>
+    </resultMap>
+    <select id="queryAllCommodity" resultMap="commodityAndPic1">
+        SELECT
+            erc.cid,erc.user_id,erc.title,erc.detail,erc.deposit,erc.rent,erc.rental_time,erc.request_time,erc.shelf_time,erc.status,
+            ercp.pid,ercp.commodity_id,ercp.pic_path
+        FROM
+            er_commodity erc LEFT JOIN er_commodity_pic ercp ON erc.cid=ercp.commodity_id
+        <where>
+            <if test="title!=null">
+                AND title LIKE "%"#{title}"%"
+            </if>
+            <if test="uid!=null">
+                AND user_id=#{uid}
+            </if>
+        </where>
+        ORDER BY
+            cid
+    </select>
+
+<!--根据id查询商品是否存在-->
+    <select id="checkCommodity" parameterType="Integer" resultType="Integer">
+        SELECT
+            COUNT(cid)
+        FROM
+            er_commodity
+        WHERE
+            cid=#{cid}
+    </select>
+
+<!--根据id查询单个商品信息（需要商品图片表查询）-->
+    <select id="queryCommodityById" resultMap="commodityAndPic1" parameterType="Integer">
+        SELECT
+            erc.cid,erc.user_id,erc.title,erc.detail,erc.deposit,erc.rent,erc.rental_time,erc.request_time,erc.shelf_time,erc.status,
+            ercp.pid,ercp.commodity_id,ercp.pic_path
+        FROM
+            er_commodity erc LEFT JOIN er_commodity_pic ercp ON erc.cid=ercp.commodity_id
+        WHERE
+            erc.cid=#{cid}
+    </select>
+
+<!--更新商品信息-->
+    <update id="updateCommodity" parameterType="com.qraffa.easyrentboot.model.entity.Commodity" keyProperty="cid">
+        UPDATE
+            er_commodity
+        <set>
+            <if test="cid!=null">
+                <!--cid=#{cid}-->
+            </if>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="title!=null">
+                title=#{title},
+            </if>
+            <if test="detail!=null">
+                detail=#{detail},
+            </if>
+            <if test="deposit!=null">
+                deposit=#{deposit},
+            </if>
+            <if test="rent!=null">
+                rent=#{rent},
+            </if>
+            <if test="rentalTime!=null">
+                rental_time=#{rentalTime},
+            </if>
+            <if test="requestTime!=null">
+                request_time=#{requestTime},
+            </if>
+            <if test="shelfTime!=null">
+                shelf_time=#{shelfTime},
+            </if>
+            <if test="status!=null">
+                status=#{status},
+            </if>
+        </set>
+        WHERE
+            cid=#{cid}
+    </update>
+
+<!--根据id删除商品-->
+    <delete id="deleteCommodityById" parameterType="Integer">
+        DELETE FROM
+            er_commodity
+        WHERE
+            cid=#{cid}
+    </delete>
+
+<!--根据id查询商品的需要归还时间-->
+    <select id="queryRequestTime" resultType="Integer" parameterType="Integer">
+        SELECT
+            request_time
+        FROM
+            er_commodity
+        WHERE
+            cid=#{cid}
+    </select>
+
+<!--根据商品id查询所属用户id-->
+    <select id="queryUserIdByCommodityId" resultType="Integer" parameterType="Integer">
+        SELECT
+            user_id
+        FROM
+            er_commodity
+        WHERE
+            cid=#{cid}
+    </select>
+
+<!--根据title查询商品-->
+    <select id="queryCommodityByTitle" resultMap="commodityAndPic1">
+        SELECT
+            erc.cid,erc.user_id,erc.title,erc.status,
+            ercp.pid,ercp.pic_path
+        FROM
+            er_commodity erc,er_commodity_pic ercp
+        <where>
+            erc.cid=ercp.commodity_id
+            <if test="title!=null">
+                AND title LIKE "%"#{title}"%"
+            </if>
+        </where>
+        ORDER BY
+            cid
+    </select>
+
+<!--根据用户id查询商品列表-->
+    <select id="queryCommodityByUid" resultMap="commodityAndPic1" parameterType="Integer">
+        SELECT
+            erc.cid,erc.user_id,erc.title,erc.status,
+            ercp.pid,ercp.pic_path
+        FROM
+            er_commodity erc,er_commodity_pic ercp
+        WHERE
+            erc.cid=ercp.commodity_id AND erc.user_id=#{uid}
+        ORDER BY
+            erc.cid
+    </select>
+
+<!--根据用户id和标题查询商品列表-->
+    <select id="queryCommodityByUidTitle" resultMap="commodityAndPic1">
+        SELECT
+            erc.cid,erc.user_id,erc.title,erc.status,
+            ercp.pid,ercp.pic_path
+        FROM
+            er_commodity erc,er_commodity_pic ercp
+        <where>
+            erc.cid=ercp.commodity_id AND erc.user_id=#{uid}
+            <if test="title != null">
+                AND title LIKE "%"#{title}"%"
+            </if>
+        </where>
+        ORDER BY
+            cid
+    </select>
+
+<!--插入商品信息-->
+    <insert id="insertCommodity" parameterType="com.qraffa.easyrentboot.model.entity.Commodity" keyProperty="cid">
+        INSERT INTO
+            er_commodity(user_id,title,detail,deposit,rent,rental_time,request_time,shelf_time,status)
+        VALUES
+            (#{userId},#{title},#{detail},#{deposit},#{rent},#{rentalTime},#{requestTime},#{shelfTime},#{status})
+    </insert>
+
+<!--更新商品信息-->
+    <update id="updateCommodityById" parameterType="com.qraffa.easyrentboot.model.entity.Commodity" keyProperty="cid">
+        UPDATE
+            er_commodity
+        <set>
+            <if test="title!=null">
+                title=#{title},
+            </if>
+            <if test="detail!=null">
+                detail=#{detail},
+            </if>
+            <if test="deposit!=null">
+                deposit=#{deposit},
+            </if>
+            <if test="rent!=null">
+                rent=#{rent},
+            </if>
+            <if test="rentalTime!=null">
+                rental_time=#{rentalTime},
+            </if>
+            <if test="requestTime!=null">
+                request_time=#{requestTime},
+            </if>
+            <if test="shelfTime!=null">
+                shelf_time=#{shelfTime},
+            </if>
+            <if test="status!=null">
+                status=#{status},
+            </if>
+        </set>
+        WHERE
+            cid=#{cid} AND user_id=#{userId}
+    </update>
+
+<!--删除商品-->
+    <delete id="deleteCommodity" parameterType="Integer">
+        DELETE FROM
+            er_commodity
+        WHERE
+            cid=#{cid}
+    </delete>
+
+<!--查询商品数量-->
+    <select id="countCommodity" resultType="Integer">
+        SELECT
+            COUNT(cid)
+        FROM
+            er_commodity
+        <where>
+            <if test="title!=null">
+                AND title LIKE "%"#{title}"%"
+            </if>
+            <if test="uid!=null">
+                AND user_id=#{uid}
+            </if>
+        </where>
+    </select>
+</mapper>

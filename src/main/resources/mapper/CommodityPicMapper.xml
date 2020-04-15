@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qraffa.easyrentboot.dao.CommodityPicDao">
+<!--根据id插入图片信息-->
+    <insert id="insertCommodityPicture" keyProperty="pid">
+        INSERT INTO
+            er_commodity_pic(commodity_id,pic_path)
+        VALUES
+            (#{cid},#{file})
+    </insert>
+
+<!--根据pid查询是否有该图片-->
+    <select id="checkPicture" resultType="Integer" parameterType="Integer">
+        SELECT
+            COUNT(pid)
+        FROM
+            er_commodity_pic
+        WHERE
+            pid=#{pid}
+    </select>
+
+<!--根据id删除图片-->
+    <delete id="deleteCommodityPicture" parameterType="Integer">
+        DELETE FROM
+            er_commodity_pic
+        WHERE
+            pid=#{pid}
+    </delete>
+
+</mapper>

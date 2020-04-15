@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qraffa.easyrentboot.dao.FavoriteDao">
+<!--根据所属用户id查询所有收藏-->
+    <resultMap id="favoriteAndCommodity" type="com.qraffa.easyrentboot.model.entity.Favorite">
+        <id property="fid" column="fid"/>
+        <result property="userId" column="user_id"/>
+        <association property="commodity" javaType="com.qraffa.easyrentboot.model.entity.Commodity">
+            <id property="cid" column="cid"/>
+            <result property="userId" column="user_id"/>
+            <result property="title" column="title"/>
+            <result property="detail" column="detail"/>
+            <result property="deposit" column="deposit"/>
+            <result property="rent" column="rent"/>
+            <result property="rentalTime" column="rental_time"/>
+            <result property="requestTime" column="request_time"/>
+            <result property="shelfTime" column="shelf_time"/>
+            <result property="status" column="status"/>
+            <collection property="commodityPicList" ofType="com.qraffa.easyrentboot.model.entity.CommodityPic">
+                <id property="pid" column="pid"/>
+                <result property="commodityId" column="commodity_id"/>
+                <result property="picPath" column="pic_path"/>
+            </collection>
+        </association>
+    </resultMap>
+    <select id="queryAllFavoriteById" resultMap="favoriteAndCommodity">
+        SELECT
+            erf.fid,
+            erc.cid,erc.user_id,erc.title,erc.detail,erc.deposit,erc.rent,erc.rental_time,erc.request_time,erc.shelf_time,erc.status,
+            ercp.pid,ercp.commodity_id,ercp.pic_path
+        FROM
+            (er_favorite erf JOIN er_commodity erc ON erf.commodity_id=erc.cid) LEFT JOIN er_commodity_pic ercp ON erc.cid=ercp.commodity_id
+        WHERE
+            erf.user_id=#{uid}
+        ORDER BY
+            erf.fid
+    </select>
+
+<!--插入收藏夹-->
+    <insert id="insertFavorite" parameterType="com.qraffa.easyrentboot.model.entity.Favorite" keyProperty="fid">
+        INSERT INTO
+            er_favorite(user_id,commodity_id)
+        VALUES
+            (#{uid},#{cid})
+    </insert>
+
+<!--根据id查询是否有该收藏-->
+    <select id="checkFavorite" resultType="Integer" parameterType="Integer">
+        SELECT
+            COUNT(fid)
+        FROM
+            er_favorite
+        WHERE
+            fid=#{fid}
+    </select>
+
+<!--根据id删除收藏-->
+    <delete id="deleteFavoriteById" parameterType="Integer">
+        DELETE FROM
+            er_favorite
+        WHERE
+            fid=#{fid}
+    </delete>
+
+<!--查询收藏数量-->
+    <select id="countFavorite" resultType="Integer">
+        SELECT
+            COUNT(fid)
+        FROM
+            er_favorite
+        WHERE
+            user_id=#{uid}
+    </select>
+
+<!--查询收藏是否重复-->
+    <select id="checkFavoriteExistent" resultType="Integer">
+        SELECT
+            COUNT(fid)
+        FROM
+            er_favorite
+        WHERE
+            user_id=#{uid} AND commodity_id=#{cid}
+    </select>
+</mapper>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qraffa.easyrentboot.dao.UserDao">
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+<!--查询所有用户-->
+    <select id="queryAllUser" resultType="com.qraffa.easyrentboot.model.entity.User">
+		SELECT
+			uid,uname,nick_name,avatar,phone,email,gender,campus,admin
+		FROM
+		 	er_user
+		ORDER BY
+			uid
+	</select>
+
+<!--用户注册-->
+	<insert id="insertUser" parameterType="com.qraffa.easyrentboot.model.entity.User" keyProperty="uid">
+		INSERT INTO
+			er_user(uname,nick_name,upwd,avatar,phone,email,gender,campus,admin)
+		VALUES
+			(#{uname},#{nickName},#{upwd},#{avatar},#{phone},#{email},#{gender},#{campus},#{admin})
+	</insert>
+
+<!--根据用户uname属性和phone属性查询是否有该用户-->
+	<select id="checkUserByUser" resultType="Integer" parameterType="com.qraffa.easyrentboot.model.entity.User">
+		SELECT
+			COUNT(uid)
+		FROM
+			er_user
+		WHERE
+			uname=#{uname} OR phone=#{phone}
+	</select>
+
+<!--根据用户id查询用户是否存在-->
+	<select id="checkUserById" resultType="Integer" parameterType="Integer">
+		SELECT
+			COUNT(uid)
+		FROM
+			er_user
+		WHERE
+			uid=#{uid}
+	</select>
+
+<!--查询用户名和密码-->
+	<select id="checkUserLogin" resultType="com.qraffa.easyrentboot.model.entity.User">
+		SELECT
+			*
+		FROM
+			er_user
+		WHERE
+			uname=#{uname} AND upwd=#{upwd}
+	</select>
+
+<!--查询管理员权限-->
+	<select id="queryUserAdmin" resultType="Integer">
+		SELECT
+			admin
+		FROM
+			er_user
+		WHERE
+			uname=#{uname}
+	</select>
+
+<!--查询单个用户信息-->
+	<select id="queryUserById" resultType="com.qraffa.easyrentboot.model.entity.User">
+		SELECT
+			uid,uname,nick_name,avatar,phone,email,gender,campus,admin
+		FROM
+			er_user
+		WHERE
+			uid=#{uid}
+	</select>
+
+<!--更新用户信息-->
+	<update id="updateUser" parameterType="com.qraffa.easyrentboot.model.entity.User">
+		UPDATE
+			er_user
+		<set>
+			<if test="nickName!=null">
+				nick_name=#{nickName},
+			</if>
+			<if test="upwd!=null">
+				upwd=#{upwd},
+			</if>
+			<if test="email!=null">
+				email=#{email},
+			</if>
+			<if test="gender!=null">
+				gender=#{gender},
+			</if>
+			<if test="campus!=null">
+				campus=#{campus},
+			</if>
+			<if test="admin!=null">
+				admin=#{admin},
+			</if>
+		</set>
+		WHERE
+		 	uid=#{uid}
+	</update>
+
+<!--查询用户密码是否一致-->
+	<select id="checkUserPassword" resultType="Integer">
+		SELECT
+			COUNT(uid)
+		FROM
+			er_user
+		WHERE
+			uid=#{uid} AND upwd=#{upwd}
+	</select>
+
+<!--更新用户密码-->
+	<update id="updateUserPassword">
+		UPDATE
+			er_user
+		SET
+			upwd=#{npwd}
+		WHERE
+			uid=#{uid}
+	</update>
+
+<!--更新用户头像-->
+	<update id="updateUserAvatar" >
+		UPDATE
+			er_user
+		SET
+			avatar=#{avatar}
+		WHERE
+			uid=#{uid}
+	</update>
+
+<!--根据id删除用户-->
+	<delete id="deleteUserById" >
+		DELETE FROM
+			er_user
+		WHERE
+			uid=#{uid}
+	</delete>
+
+<!--查询用户数量-->
+	<select id="countUser" resultType="Integer">
+		SELECT
+			COUNT(uid)
+		FROM
+			er_user
+	</select>
+
+	<!--查询单个用户信息-->
+	<select id="queryUserByName" resultType="com.qraffa.easyrentboot.model.entity.User">
+		SELECT
+			uid,uname,nick_name,avatar,phone,email,gender,campus,admin
+		FROM
+			er_user
+		WHERE
+			uname=#{uname}
+	</select>
+</mapper>

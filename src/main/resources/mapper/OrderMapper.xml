@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qraffa.easyrentboot.dao.OrderDao">
+<!--查询所有订单信息-->
+    <resultMap id="orderAndCommodity" type="com.qraffa.easyrentboot.model.entity.Order">
+        <id property="oid" column="oid"/>
+        <result property="buyerId" column="buyer_id"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="actualRentalTime" column="actual_rental_time"/>
+        <result property="actualTime" column="actual_time"/>
+        <result property="creationTime" column="creation_time"/>
+        <result property="status" column="status"/>
+        <association property="commodity" javaType="com.qraffa.easyrentboot.model.entity.Commodity">
+            <id property="cid" column="cid"/>
+            <result property="userId" column="user_id"/>
+            <result property="title" column="title"/>
+            <result property="detail" column="detail"/>
+            <result property="deposit" column="deposit"/>
+            <result property="rent" column="rent"/>
+            <result property="rentalTime" column="rental_time"/>
+            <result property="requestTime" column="request_time"/>
+            <result property="shelfTime" column="shelf_time"/>
+            <result property="status" column="status"/>
+            <collection property="commodityPicList" ofType="com.qraffa.easyrentboot.model.entity.CommodityPic">
+                <id property="pid" column="pid"/>
+                <result property="commodityId" column="commodity_id"/>
+                <result property="picPath" column="pic_path"/>
+            </collection>
+        </association>
+    </resultMap>
+    <select id="queryAllOrder" resultMap="orderAndCommodity">
+        SELECT
+            ero.oid,ero.buyer_id,ero.seller_id,ero.actual_rental_time,ero.actual_time,ero.creation_time,ero.status,
+            erc.cid,erc.user_id,erc.title,erc.detail,erc.deposit,erc.rent,erc.rental_time,erc.request_time,erc.shelf_time,erc.status,
+            ercp.pid,ercp.commodity_id,ercp.pic_path
+        FROM
+            (er_order ero JOIN er_commodity erc ON ero.commodity_id=erc.cid) LEFT JOIN er_commodity_pic ercp ON erc.cid=ercp.commodity_id
+        <where>
+            <if test="uid!=null">
+                ero.buyer_id=#{uid} OR ero.seller_id=#{uid}
+            </if>
+        </where>
+        ORDER BY
+            ero.oid
+    </select>
+
+<!--根据id查询是否有该订单-->
+    <select id="checkOrder" resultType="Integer" parameterType="Integer">
+        SELECT
+            COUNT(oid)
+        FROM
+            er_order
+        WHERE
+            oid=#{oid}
+    </select>
+
+<!--根据id查询单个订单信息-->
+    <select id="queryOrderById" parameterType="Integer" resultMap="orderAndCommodity">
+        SELECT
+            ero.oid,ero.buyer_id,ero.seller_id,ero.actual_rental_time,ero.actual_time,ero.creation_time,ero.status,
+            erc.cid,erc.user_id,erc.title,erc.detail,erc.deposit,erc.rent,erc.rental_time,erc.request_time,erc.shelf_time,erc.status,
+            ercp.pid,ercp.commodity_id,ercp.pic_path
+        FROM
+            (er_order ero JOIN er_commodity erc ON ero.commodity_id=erc.cid) LEFT JOIN er_commodity_pic ercp ON erc.cid=ercp.commodity_id
+        WHERE
+            ero.oid=#{oid}
+    </select>
+
+<!--插入订单信息-->
+    <insert id="insertOrder" parameterType="com.qraffa.easyrentboot.model.entity.Order" keyProperty="oid">
+        INSERT INTO
+            er_order(buyer_id,seller_id,commodity_id,creation_time,status)
+        VALUES
+            (#{buyerId},#{sellerId},#{commodityId},#{creationTime},0)
+    </insert>
+
+<!--修改订单-->
+    <update id="updateOrder" keyProperty="Integer" parameterType="com.qraffa.easyrentboot.model.entity.Order">
+        UPDATE
+            er_order
+        <set>
+        status=#{status},
+            <choose>
+                <when test="status==2">
+                    actual_rental_time=#{actualRentalTime},
+                </when>
+                <when test="status==3">
+                    actual_time=#{actualTime},
+                </when>
+                <otherwise>
+
+                </otherwise>
+            </choose>
+        </set>
+        WHERE
+            oid=#{oid}
+    </update>
+
+<!--根据id删除订单-->
+    <delete id="deleteOrderById" parameterType="Integer">
+        DELETE FROM
+            er_order
+        WHERE
+            oid=#{oid}
+    </delete>
+
+<!--查询订单数量-->
+    <select id="countOrder" resultType="Integer">
+        SELECT
+            COUNT(oid)
+        FROM
+            er_order
+        <where>
+            <if test="uid!=null">
+                buyer_id=#{uid} OR seller_id=#{uid}
+            </if>
+        </where>
+    </select>
+</mapper>
