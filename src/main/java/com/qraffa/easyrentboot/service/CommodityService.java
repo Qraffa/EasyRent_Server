@@ -1,16 +1,21 @@
 package com.qraffa.easyrentboot.service;
 
 import com.qraffa.easyrentboot.dao.CommodityDao;
+import com.qraffa.easyrentboot.dao.CommodityPicDao;
 import com.qraffa.easyrentboot.dao.UserDao;
 import com.qraffa.easyrentboot.model.StatusEnum;
 import com.qraffa.easyrentboot.model.entity.Commodity;
+import com.qraffa.easyrentboot.model.entity.CommodityPic;
 import com.qraffa.easyrentboot.model.entity.User;
 import com.qraffa.easyrentboot.model.exception.ExceptionModel;
 import com.qraffa.easyrentboot.model.res.commodity.entity.ListCommodity;
+import com.qraffa.easyrentboot.model.utils.ImgSave;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -18,6 +23,8 @@ public class CommodityService {
 
     @Autowired
     private CommodityDao commodityDao;
+    @Autowired
+    private CommodityPicDao commodityPicDao;
     @Autowired
     private UserDao userDao;
 
@@ -122,11 +129,13 @@ public class CommodityService {
      * @param commodity
      * @throws ExceptionModel
      */
-    public void insertCommodity(Commodity commodity) throws ExceptionModel {
+    public Integer insertCommodity(Commodity commodity) throws ExceptionModel {
         // 检查用户是否存在
         checkUserById(commodity.getUserId());
         // 添加商品
         commodityDao.insertCommodity(commodity);
+        Integer cid = commodity.getCid();
+        return cid;
     }
 
     /**
@@ -179,5 +188,30 @@ public class CommodityService {
         checkUserById(uid);
         User user=userDao.queryUserById(uid);
         return user.getNickName();
+    }
+
+    /**
+     * 更新商品图片
+     * @param cid
+     * @param multipartFile
+     * @return
+     * @throws Exception
+     */
+    public void updateCommodityPicture(Integer cid, MultipartFile[] multipartFile) throws Exception {
+        // 检查商品是否存在
+        checkCommodityById(cid);
+        int len = multipartFile.length;
+        for (int i = 0; i < len; i++) {
+            MultipartFile excelFile = multipartFile[i];
+            // 校验传入文件有效性
+            if (excelFile==null || excelFile.isEmpty()){
+                throw new RuntimeException("文件传入错误");
+            }
+            String fileName = String.format("%s_%s",new Date().getTime(),excelFile.getOriginalFilename());
+            // 保存图片
+            String url= ImgSave.saveFile(excelFile,fileName);
+            // 将商品图片路径存入数据库
+            commodityPicDao.insertCommodityPicture(cid,url);
+        }
     }
 }

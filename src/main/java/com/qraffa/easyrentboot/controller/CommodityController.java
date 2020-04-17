@@ -9,9 +9,10 @@ import com.qraffa.easyrentboot.model.req.commodity.*;
 import com.qraffa.easyrentboot.model.res.commodity.GetCommodityListRes;
 import com.qraffa.easyrentboot.model.res.commodity.GetCommodityRes;
 import com.qraffa.easyrentboot.model.res.commodity.GetMyCommodityListRes;
+import com.qraffa.easyrentboot.model.res.commodity.PostCommodityRes;
 import com.qraffa.easyrentboot.model.res.commodity.entity.ListCommodity;
-import com.qraffa.easyrentboot.model.utils.SessionUser;
 import com.qraffa.easyrentboot.service.CommodityService;
+import com.qraffa.easyrentboot.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
@@ -20,7 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -30,6 +30,9 @@ public class CommodityController {
 
     @Autowired
     private CommodityService commodityService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -120,8 +123,8 @@ public class CommodityController {
         Commodity commodity=commodityService.queryCommodity(req.getCid());
         GetCommodityRes res = new GetCommodityRes();
         res.setCommodity(commodity);
-        // 根据商品查询商品发布者的nickName
-        res.setNickName(commodityService.getNickNameById(commodity.getUserId()));
+        // 根据商品查询商品发布者的用户信息
+        res.setUser(userService.getUser(commodity.getUserId()));
         return new ReturnModel().withOkData(res);
     }
 
@@ -145,8 +148,10 @@ public class CommodityController {
         BeanUtils.copyProperties(req,commodity);
         commodity.setUserId(Integer.valueOf(jwtUtil.getUserId()));
         // 添加商品
-        commodityService.insertCommodity(commodity);
-        return new ReturnModel().withOkData(null);
+        PostCommodityRes res = new PostCommodityRes();
+        Integer cid = commodityService.insertCommodity(commodity);
+        res.setCid(cid);
+        return new ReturnModel().withOkData(res);
     }
 
     /**
@@ -190,6 +195,13 @@ public class CommodityController {
         //SessionUser sessionUser = (SessionUser)httpSession.getAttribute("user_session_key");
         // 删除商品
         commodityService.deleteCommodity(req.getCid(),Integer.valueOf(jwtUtil.getUserId()));
+        return new ReturnModel().withOkData(null);
+    }
+
+    @PostMapping("/commodityPic")
+    @ApiOperation(value = "添加商品图片")
+    public ReturnModel postCommodityPic(PostCommodityPicReq req) throws Exception {
+        commodityService.updateCommodityPicture(req.getCid(),req.getMultipartFiles());
         return new ReturnModel().withOkData(null);
     }
 

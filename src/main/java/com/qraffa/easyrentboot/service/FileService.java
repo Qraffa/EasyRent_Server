@@ -8,10 +8,17 @@ import java.io.File;
 
 @Service
 public class FileService {
+    // server
+    //// 设置文件存放路径
+    //private final String SaveFilePath = "/var/www/image";
+    //// 设置静态文件服务器的ip:端口
+    //private final String Host = "http://115.29.201.93:8091/image";
+
+    // local
     // 设置文件存放路径
-    private final String SaveFilePath = "/home/qraffa/code/server/image";
+    private final String SaveFilePath = "/var/www/image";
     // 设置静态文件服务器的ip:端口
-    private final String Host = "http://127.0.0.1:8080/image";
+    private final String Host = "http://115.29.201.93:8091/image";
 
     /**
      * 保存文件

@@ -176,7 +176,7 @@
     </select>
 
 <!--插入商品信息-->
-    <insert id="insertCommodity" parameterType="com.qraffa.easyrentboot.model.entity.Commodity" keyProperty="cid">
+    <insert id="insertCommodity" parameterType="com.qraffa.easyrentboot.model.entity.Commodity" useGeneratedKeys="true" keyProperty="cid">
         INSERT INTO
             er_commodity(user_id,title,detail,deposit,rent,rental_time,request_time,shelf_time,status)
         VALUES

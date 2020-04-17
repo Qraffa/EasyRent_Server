@@ -9,6 +9,11 @@ spring:
     url: jdbc:mysql://115.29.201.93:3306/er?useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+      enabled: true
 
 # mybatis配置
 mybatis:

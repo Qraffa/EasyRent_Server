@@ -176,7 +176,7 @@ public class UserController {
      */
     @PostMapping("/api/v1/avatar")
     @ApiOperation(value = "更新用户头像")
-    public ReturnModel postAvatar(@RequestBody @Validated PostAvatar postAvatar, BindingResult bindingResult) throws Exception {
+    public ReturnModel postAvatar(PostAvatar postAvatar, BindingResult bindingResult) throws Exception {
         // 数据校验
         if (bindingResult.hasErrors()){
             return new ReturnModel().withStatus(StatusEnum.USER_MESSAGE_INCOMPLETE);

@@ -9,6 +9,7 @@ import com.qraffa.easyrentboot.model.entity.websocket.InMessage;
 import com.qraffa.easyrentboot.model.entity.websocket.OutMessage;
 import com.qraffa.easyrentboot.model.exception.ExceptionModel;
 import com.qraffa.easyrentboot.model.req.message.GetMessageListReq;
+import com.qraffa.easyrentboot.model.req.message.PostContact;
 import com.qraffa.easyrentboot.model.res.message.GetMessageListRes;
 import com.qraffa.easyrentboot.service.MessageService;
 import com.qraffa.easyrentboot.util.SocketSessionRegistry;
@@ -91,6 +92,17 @@ public class MessageController {
         Integer uid = Integer.valueOf(jwtUtil.getUserId());
         List<User> list = messageService.getMessageUserList(uid);
         return new ReturnModel().withOkData(list);
+    }
+
+    @PostMapping("/contact")
+    @ApiOperation(value = "添加新的联系人")
+    public ReturnModel addContact(@RequestBody PostContact postContact) throws ExceptionModel {
+        InMessage inMessage = new InMessage();
+        inMessage.setToken(postContact.getToken());
+        inMessage.setTo(postContact.getTo());
+        inMessage.setContent(postContact.getContent());
+        messageService.handlerMessage(inMessage);
+        return new ReturnModel().withOkData(null);
     }
 
     /**

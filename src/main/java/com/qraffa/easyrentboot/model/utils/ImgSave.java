@@ -6,9 +6,9 @@ import java.io.File;
 
 public class ImgSave {
     // 设置文件存放路径
-    private static final String SaveFilePath = "/home/qraffa/code/server/image";
+    private static final String SaveFilePath = "/var/www/image";
     // 设置静态文件服务器的ip:端口
-    private static final String Host = "image";
+    private static final String Host = "http://115.29.201.93:8091/image";
 
     /**
      * 保存文件
