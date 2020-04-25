@@ -101,7 +101,11 @@ public class MessageController {
         inMessage.setToken(postContact.getToken());
         inMessage.setTo(postContact.getTo());
         inMessage.setContent(postContact.getContent());
-        messageService.handlerMessage(inMessage);
+        List<Message> messageList = messageService.handlerMessage(inMessage);
+        if(messageList != null) {
+            // 消息推送给订阅了 /queue/chat/{toUser} 的用户
+            messagingTemplate.convertAndSend("/queue/chat/" + postContact.getTo(), messageList);
+        }
         return new ReturnModel().withOkData(null);
     }
 

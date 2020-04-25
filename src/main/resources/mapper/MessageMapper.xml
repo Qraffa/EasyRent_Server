@@ -49,7 +49,7 @@
     <!--  查询消息聊天好友列表  -->
     <select id="getMessageUserList" resultType="com.qraffa.easyrentboot.model.entity.User">
         SELECT
-            DISTINCT uname,nick_name,uid
+            DISTINCT uname,nick_name,uid,avatar
         FROM
             er_user JOIN er_message ON (er_user.uid=er_message.sender_id OR er_user.uid=er_message.receiver_id)
         WHERE
