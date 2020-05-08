@@ -4,9 +4,9 @@ server:
 # 数据源配置
 spring:
   datasource:
-    username: scnua204
-    password: scnua204
-    url: jdbc:mysql://115.29.201.93:3306/er?useUnicode=true&characterEncoding=utf-8
+    username: ENC(R1lpKAwWdqUS4HC4TjD0H9E3toJzLUmxUwY2KVXiQXuvlPDCot2aRFoVkXuBqNwR)
+    password: ENC(B9f5M5jz1yAQ+2tnso6rUXf13/FKfNmkmEJ/w51JVYTXh/LLTJWC4coLHTUCyFMj)
+    url: ENC(QXdErpD1aQbSOYnUpk9pHtrG4TQJY6DImtmAkF0zeNszwDlBL8DKEcWhQPrJkVG/Iks9ahhvGTQFdRSftMbCoFQLau0L3U5nc3uh8ftd7jbilMKL1MdrBVb09w8FaeffaijK86q23BiPma+2829wfw==)
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
   servlet:
